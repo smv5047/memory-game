@@ -16,6 +16,7 @@ body {
     flex-wrap: wrap;
     display: flex;
     margin: auto;
+    perspective: 1000px;
 }
 
 .memory-card {
@@ -24,6 +25,10 @@ body {
     position: relative;
     margin: 5px;
     transform: scale(1);
+    transform-style: preserve-3d; 
+    transition: transform .5s;
+    /* This styling ensures the memory card is withi the memory game
+    'perspective: 1000px 3d effect */
 }
 
 .memory-card:active {
@@ -43,5 +48,12 @@ body {
         border-radius: 5px;
         background: #1c7ccc;
         position: absolute;
+        backface-visibility: hidden;
+        /*every image has a backface, so we must hide it to execute
+        our card flip */
+}
+
+.front-face {
+    transform: rotateY(180deg);
 }
 
