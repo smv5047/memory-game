@@ -1,49 +1,84 @@
+
 const cards = document.querySelectorAll('.memory-card');
-
 // To determine if flipped card is players first flipped card
-
 let hasFlippedCard = false;
+let lockBoard = false;
 let firstCard, secondCard;
 
 
 
 function flipCard () {
+    // The below will stop the flipCard function if the board is locked
+    if (lockBoard) return;
+    if (this === firstCard) return;
     console.log(this); //represents the element that fired off the event
     //We want to access the class list of the memory card and 
     //toggle the flip class 
     //toggle means, if the class 'flip' isthere , remove it
     //if class isn't there, add it onto the class
-    this.classList.toggle('flip');
+    this.classList.add('flip');
 
     if (!hasFlippedCard) {
-        //firstcard
+        //first click
         hasFlippedCard = true;
         firstCard = this;
 
-        
     } else  {
-        hasFlippedCard = false;
+        
         secondCard = this;
 
-        console.log(firstCard, secondCard);
+        checkForMatch();
     }
 
+
+};
+
+function checkForMatch() {
     //do cards match
     //Check if dataset from 1st card and 2nd card are the same
     //If they are, we remove event listener so it can't move anymore
     //If not, we will unflipped to original state
     if (firstCard.dataset.framework === secondCard.dataset.framework) {
-        //it's a match
-        firstCard.removeEventListener('click', flipCard);
-        secondCard.removeEventListener('click', flipCard);
+        disableCards();
     } else {
-        //not a match
-        setTimeout(() =>{
-        firstCard.classList.remove('flip');
-        secondCard.classList.remove('flip');
-        },1500);
+        unFlipCards();
     }
 };
 
+function disableCards() {
+        //it's a match
+        firstCard.removeEventListener('click', flipCard);
+        secondCard.removeEventListener('click', flipCard);
+
+        resetBoard();
+}
+
+function unFlipCards () {
+        lockBoard = true;
+        //not a match
+        setTimeout(() =>{
+            firstCard.classList.remove('flip');
+            secondCard.classList.remove('flip');
+
+            resetBoard();
+            },1500);
+};
+
+function resetBoard() {
+    [hasFlippedCard, lockBoard] = [false, false];
+    [firstCard, secondCard] = [null, null];
+}
+
+// By putting parehthesis around the entire function
+//We've turned it into an IIFE
+//This will cause it to be invoked right after its declared
+//This way the board is shuffled before it starts
+
+(function shuffle () {
+    cards.forEach(card => {
+        let randomPos = Math.floor(Math.random() * 12);
+        card.style.order = randomPos;
+    });
+})();
 
 cards.forEach(cards => cards.addEventListener('click', flipCard))
